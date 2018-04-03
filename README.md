@@ -1,14 +1,15 @@
-# text-detection-ctpn
+# text-detection-ctpn-win
 
-This repo is a text detection project based on ctpn (connectionist text proposal network). It is implemented in tensorflow by @eragonruan on linux and can be found in [here](https://github.com/eragonruan/text-detection-ctpn). I fixed all MSVC complition issues, so that it can be run on Windows 10 with Python 3.6.
+This repo is a text detection project based on ctpn (connectionist text proposal network). It is originally implemented in tensorflow on Linux and can be found in [here](https://github.com/eragonruan/text-detection-ctpn). In this repo, I repaired all MSVC compilation issues by patching gpu_nms.pyx, gpu_nms.cpp, setup.py, and _msvccompiler.py, so that it can be run on Windows 10 with Python 3.6.
 
 The origin repo in caffe can be found in [here](https://github.com/tianzhi0549/CTPN). Also, the origin paper can be found in [here](https://arxiv.org/abs/1609.03605). For more detail about the paper and code, see this [blog](http://slade-ruan.me/2017/10/22/text-detection-ctpn/).
 
 ***
+
 # setup
-- requirements: tensorflow1.3, cython0.24, opencv-python, easydict,(recommend to install Anaconda)
+- requirements: tensorflow1.3, cython0.24, opencv-python, easydict (recommend to install Anaconda)
 - if you do not have a gpu device, follow here to [setup](https://github.com/eragonruan/text-detection-ctpn/issues/43)
-- You can directly use lib/utils (i.e. bbox.pyd, cython_nms.pyd, and gpu_nms.pyd). No additional compile step is needed unless errors occur. A detailed compile instruction can be found in the last section. 
+- You can directly use lib/utils (i.e. bbox.pyd, cython_nms.pyd, and gpu_nms.pyd). No additional compilation step is needed unless errors occur. See the last section for more inforamtion.
 ***
 
 # parameters
@@ -74,9 +75,9 @@ python ./ctpn/train_net.py
 <img src="/data/results/008.jpg" width=320 height=480 /><img src="/data/oriented_results/008.jpg" width=320 height=480 />
 ***
 # compiling lib/utils on Windows
-- prerequisite: Win 10, Python 3.6, Visual Studio 2015 (MSVC toolchain is required), CUDA 8 (nvcc.exe is required)
-- requirements: cython0.24, (recommend to install Anaconda)
-- go to line 25 in gpu_nms.pyx, replace
+- prerequisite: Win 10, Python 3.6, Visual Studio 2015 (MSVC toolchain is required), CUDA 8 (nvcc is required)
+- requirements: cython 0.24, (recommend to install Anaconda)
+- 1) open gpu_nms.pyx, go to line 25, replace
 ```c
 cdef np.ndarray[np.int_t, ndim=1] \
 ```
@@ -84,7 +85,7 @@ as
 ```c
 cdef np.ndarray[np.intp_t, ndim=1] \
 ```
-- run
+- 2) open a cmd window and run
 ```shell
 cd lib/utils
 cython bbox.pyx
@@ -95,11 +96,11 @@ set CUDAHOME=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0
 set VS140COMNTOOLS=C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\
 set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
 ```
-- go to line 1942 in gpu_nms.cpp, replace __pyx_t_5numpy_int32_t * as int*
+- 3) open gpu_nms_cpp, find _nms(...) and replace __pyx_t_5numpy_int32_t * as int*
 ```c
 _nms((&(*__Pyx_BufPtrStrided1d(int*, __pyx_pybuffernd_keep.rcbuffer->pybuffer.buf, __pyx_t_10, __pyx_pybuffernd_keep.diminfo[0].strides))), (&__pyx_v_num_out), (&(*__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_sorted_dets.rcbuffer->pybuffer.buf, __pyx_t_12, __pyx_pybuffernd_sorted_dets.diminfo[0].strides, __pyx_t_13, __pyx_pybuffernd_sorted_dets.diminfo[1].strides))), __pyx_v_boxes_num, __pyx_v_boxes_dim, __pyx_t_14, __pyx_v_device_id);
 ```
-- backup <Anaconda root>\Lib\distutils\_msvccompiler.py, then replace 
+- 4) backup <Anaconda root>\Lib\distutils\_msvccompiler.py, then replace 
 ```python
 best_version, best_dir = _find_vc2017() 
 ``` 
@@ -108,7 +109,7 @@ as
 best_version, best_dir = _find_vc2017() 
 best_version = None
 ```
-goto line 411, insert
+go to line 411, insert
 ```python
             elif ext in ['.cu']:
                 try:
@@ -127,8 +128,8 @@ goto line 411, insert
                     raise CompileError(msg)
                 continue
 ```
-- Use the fixed lib/utils/setup.py to build the library.
+- 5) use the repaired lib/utils/setup.py to build the library.
 ```shell
 python setup.py build_ext --inplace
 ```
-- it works if bbox.pyd, cython_nms.pyd, and gpu_nms.pyd are built.
+- 6) it works if bbox.pyd, cython_nms.pyd, and gpu_nms.pyd are built.
