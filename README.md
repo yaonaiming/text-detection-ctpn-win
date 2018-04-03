@@ -1,6 +1,6 @@
 # text-detection-ctpn-win
 
-This repo is a text detection project based on ctpn (connectionist text proposal network). It is originally implemented in tensorflow on Linux and can be found in [here](https://github.com/eragonruan/text-detection-ctpn). In this repo, I fixed all MSVC compilation issues by patching gpu_nms.pyx, gpu_nms.cpp, setup.py, and _msvccompiler.py, so that it can be run on Windows 10 with Python 3.6.
+This repo is a text detection project based on ctpn (connectionist text proposal network). It is originally implemented in tensorflow on Linux and can be found in [here](https://github.com/eragonruan/text-detection-ctpn). In this repo, I repaired all MSVC compilation issues by patching gpu_nms.pyx, gpu_nms.cpp, setup.py, and _msvccompiler.py, so that it can be run on Windows 10 with Python 3.6.
 
 The origin repo in caffe can be found in [here](https://github.com/tianzhi0549/CTPN). Also, the origin paper can be found in [here](https://arxiv.org/abs/1609.03605). For more detail about the paper and code, see this [blog](http://slade-ruan.me/2017/10/22/text-detection-ctpn/).
 
@@ -128,7 +128,7 @@ go to line 411, insert
                     raise CompileError(msg)
                 continue
 ```
-- 5) use the fixed lib/utils/setup.py to build the library.
+- 5) use the repaired lib/utils/setup.py to build the library.
 ```shell
 python setup.py build_ext --inplace
 ```
